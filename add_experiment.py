@@ -340,14 +340,14 @@ if __name__ == '__main__':
                     DSTR_OUT[tname]['Images'][tit]['image%s%s' % (
                         str(DSTR_OUT[tname]['Images']['Count']),
                         chr(DSTR_OUT[tname]['Images'][tit]['Count']-1+ord('a')))] = fig2upload
-                                                        
+
         fid = open(os.path.join(OUTPUT_PATH,FILE_OUT),'w')
         #for key in sorted(DSTR_OUT.keys(), key=lambda x:(x[0:2],get_intg_time(x))):
         for key in sorted(DSTR_OUT.keys(), key=lambda x:(x[0],len(x))):
             fid.write('[%s]\n\n' % key)
             fid.write('Path: %s\n\n' % DSTR_OUT[key]['Path'])
             for skey in  sorted(DSTR_OUT[key]['Images']['Hash']):
-                fid.write('imageTitle%d: %s\n' % (DSTR_OUT[key]['Images'][skey]['imgCount'],skey))            
+                fid.write('imageTitle%d: %s\n' % (DSTR_OUT[key]['Images'][skey]['imgCount'],skey))
                 for i in range(DSTR_OUT[key]['Images'][skey]['Count']):
                     try:
                         bp = 'image%d%s' % (DSTR_OUT[key]['Images'][skey]['imgCount'],chr(i+ord('a')))
@@ -358,15 +358,19 @@ if __name__ == '__main__':
                         print 'skey', skey
                         print 'bp',bp
                         print 'to write', towrite
-                fid.write('\n')            
-                
+                fid.write('\n')
+
         if linkMad:
             expId = MAD_EXP
             year = int(expId[0:4])
             month = int(expId[4:6])
             day = int(expId[6:8])
-            num = int(expId[10:12])    
-            extChar =chr(num+ord('a')-1)
+            num = int(expId[10:12])
+            #extChar =chr(num+ord('a')-1)
+            if num <= 26:
+                extChar = chr(96 + num)
+            else:
+                extChar = chr(96 + (num-1)//26) + chr(97 + (num-1)%26)
             thisDate = datetime.datetime(year, month, day)
             #madLink='%sexp=%s/%s/%s%s&displayLevel=0' % (MadPath,thisDate.strftime('%Y').lower(),INSTRUMENTS[inst]['INST_MNEUMONIC'],thisDate.strftime('%d%b%y').lower(), extChar)
             madLink='%sexperiment_list=/%s/%s/%s%s' % (MadPath,thisDate.strftime('%Y').lower(),INSTRUMENTS[inst]['INST_MNEUMONIC'],thisDate.strftime('%d%b%y').lower(), extChar)
