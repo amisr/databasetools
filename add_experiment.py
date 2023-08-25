@@ -341,47 +341,46 @@ if __name__ == '__main__':
                         str(DSTR_OUT[tname]['Images']['Count']),
                         chr(DSTR_OUT[tname]['Images'][tit]['Count']-1+ord('a')))] = fig2upload
 
-        fid = open(os.path.join(OUTPUT_PATH,FILE_OUT),'w')
-        #for key in sorted(DSTR_OUT.keys(), key=lambda x:(x[0:2],get_intg_time(x))):
-        for key in sorted(DSTR_OUT.keys(), key=lambda x:(x[0],len(x))):
-            fid.write('[%s]\n\n' % key)
-            fid.write('Path: %s\n\n' % DSTR_OUT[key]['Path'])
-            for skey in  sorted(DSTR_OUT[key]['Images']['Hash']):
-                fid.write('imageTitle%d: %s\n' % (DSTR_OUT[key]['Images'][skey]['imgCount'],skey))
-                for i in range(DSTR_OUT[key]['Images'][skey]['Count']):
-                    try:
-                        bp = 'image%d%s' % (DSTR_OUT[key]['Images'][skey]['imgCount'],chr(i+ord('a')))
-                        towrite = '%s: %s\n' % (bp, DSTR_OUT[key]['Images'][skey][bp])
-                        fid.write(towrite)
-                    except:
-                        print '???'
-                        print 'skey', skey
-                        print 'bp',bp
-                        print 'to write', towrite
-                fid.write('\n')
+        with open(os.path.join(OUTPUT_PATH,FILE_OUT),'w') as fid:
+            #for key in sorted(DSTR_OUT.keys(), key=lambda x:(x[0:2],get_intg_time(x))):
+            for key in sorted(DSTR_OUT.keys(), key=lambda x:(x[0],len(x))):
+                fid.write('[%s]\n\n' % key)
+                fid.write('Path: %s\n\n' % DSTR_OUT[key]['Path'])
+                for skey in  sorted(DSTR_OUT[key]['Images']['Hash']):
+                    fid.write('imageTitle%d: %s\n' % (DSTR_OUT[key]['Images'][skey]['imgCount'],skey))
+                    for i in range(DSTR_OUT[key]['Images'][skey]['Count']):
+                        try:
+                            bp = 'image%d%s' % (DSTR_OUT[key]['Images'][skey]['imgCount'],chr(i+ord('a')))
+                            towrite = '%s: %s\n' % (bp, DSTR_OUT[key]['Images'][skey][bp])
+                            fid.write(towrite)
+                        except:
+                            print '???'
+                            print 'skey', skey
+                            print 'bp',bp
+                            print 'to write', towrite
+                    fid.write('\n')
 
-        if linkMad:
-            expId = MAD_EXP
-            year = int(expId[0:4])
-            month = int(expId[4:6])
-            day = int(expId[6:8])
-            num = int(expId[10:12])
-            #extChar =chr(num+ord('a')-1)
-            if num <= 26:
-                extChar = chr(96 + num)
-            else:
-                extChar = chr(96 + (num-1)//26) + chr(97 + (num-1)%26)
-            thisDate = datetime.datetime(year, month, day)
-            #madLink='%sexp=%s/%s/%s%s&displayLevel=0' % (MadPath,thisDate.strftime('%Y').lower(),INSTRUMENTS[inst]['INST_MNEUMONIC'],thisDate.strftime('%d%b%y').lower(), extChar)
-            madLink='%sexperiment_list=/%s/%s/%s%s' % (MadPath,thisDate.strftime('%Y').lower(),INSTRUMENTS[inst]['INST_MNEUMONIC'],thisDate.strftime('%d%b%y').lower(), extChar)
-            # Madrigal2:
-            # http://isr.sri.com/madrigal/cgi-bin/madExperiment.cgi?exp=2023/pfa/01mar23b&displayLevel=0
-            # In Madrigal3:
-            # https://data.amisr.com/madrigal/showExperiment?experiment_list=/2023/pfa/01mar23b
-            fid.write('[Links]\n\n')
-            fid.write('Path: %s\n\n' % '')
-            fid.write('imageTitle1: %s\n' % ('Access Data from Madrigal'))            
-            bp = 'image1a'
-            fid.write('%s: %s\n\n' % (bp, madLink))              
-        fid.close()
+            if linkMad:
+                expId = MAD_EXP
+                year = int(expId[0:4])
+                month = int(expId[4:6])
+                day = int(expId[6:8])
+                num = int(expId[10:12])
+                #extChar =chr(num+ord('a')-1)
+                if num <= 26:
+                    extChar = chr(96 + num)
+                else:
+                    extChar = chr(96 + (num-1)//26) + chr(97 + (num-1)%26)
+                thisDate = datetime.datetime(year, month, day)
+                #madLink='%sexp=%s/%s/%s%s&displayLevel=0' % (MadPath,thisDate.strftime('%Y').lower(),INSTRUMENTS[inst]['INST_MNEUMONIC'],thisDate.strftime('%d%b%y').lower(), extChar)
+                madLink='%sexperiment_list=/%s/%s/%s%s' % (MadPath,thisDate.strftime('%Y').lower(),INSTRUMENTS[inst]['INST_MNEUMONIC'],thisDate.strftime('%d%b%y').lower(), extChar)
+                # Madrigal2:
+                # http://isr.sri.com/madrigal/cgi-bin/madExperiment.cgi?exp=2023/pfa/01mar23b&displayLevel=0
+                # In Madrigal3:
+                # https://data.amisr.com/madrigal/showExperiment?experiment_list=/2023/pfa/01mar23b
+                fid.write('[Links]\n\n')
+                fid.write('Path: %s\n\n' % '')
+                fid.write('imageTitle1: %s\n' % ('Access Data from Madrigal'))            
+                bp = 'image1a'
+                fid.write('%s: %s\n\n' % (bp, madLink))              
             
