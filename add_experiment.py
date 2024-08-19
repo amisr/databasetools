@@ -67,12 +67,14 @@ LOG_FILENAME = 'GenExpLists.log'
 
 copyON = 1
 linkMad = 1
-#MadPath = '%(MADRIGAL_HTTP_PATH)s'
+Mad2Path = '%(MADRIGAL_HTTP_PATH)s'
 MadPath = '%(MADRIGAL3_HTTP_PATH)s'
 
 def usage():
     print "usage: ", sys.argv[0]
     print "\t EXPERIMENT DIRECTORIES"
+    print "\t EXPERIMENT DIRECTORIES mad2"
+    print "\t optional mad2 : for  posting old madrigal2 link"
 
     sys.exit(2)
 
@@ -115,7 +117,12 @@ if __name__ == '__main__':
         dirs2do = sorted(glob.glob(sys.argv[1]))
     except:
         usage()  
-        
+
+    try:
+        onlymad2 = sys.argv[2] == "mad2"
+    except:
+        onlymad2 = False
+
     for direc in dirs2do:
         
         if not os.path.isdir(direc) or os.path.islink(direc):
@@ -148,9 +155,10 @@ if __name__ == '__main__':
             config.set('DEFAULT','ExperimentName',MAD_EXP)
         
         DSTR_OUT={}
+        file_version = "_001"
         if copyON:
             DSTR_OUT['Data Files']=copy.deepcopy(SEC_TEMPLATE)
-            DSTR_OUT['Data Files']['Path']='DataFiles'
+            DSTR_OUT['Data Files']['Path']= 'DataFiles' + file_version
             fdir = os.path.join(OUTPUT_PATH,DSTR_OUT['Data Files']['Path'])
             if not os.path.exists(fdir):
                 try: 
@@ -159,7 +167,7 @@ if __name__ == '__main__':
                     raise IOError, 'Unable to make dir %s' % fdir
 
             DSTR_OUT['Additional Plots']=copy.deepcopy(SEC_TEMPLATE)
-            DSTR_OUT['Additional Plots']['Path']='AdditPlots'
+            DSTR_OUT['Additional Plots']['Path']='AdditPlots' + file_version
             additdir = os.path.join(OUTPUT_PATH,DSTR_OUT['Additional Plots']['Path'])
             if not os.path.exists(additdir):
                 try: 
@@ -217,7 +225,7 @@ if __name__ == '__main__':
                 tpath = DSTR_OUT[tname]['Path']
             else:
                 DSTR_OUT[tname]=copy.deepcopy(SEC_TEMPLATE)
-                tpath = 'Path%s' % str(len(DSTR_OUT.keys()))
+                tpath = 'Path%s' % str(len(DSTR_OUT.keys())) + file_version
                 DSTR_OUT[tname]['Path'] = tpath
 
             # make dir
@@ -372,8 +380,10 @@ if __name__ == '__main__':
                 else:
                     extChar = chr(96 + (num-1)//26) + chr(97 + (num-1)%26)
                 thisDate = datetime.datetime(year, month, day)
-                #madLink='%sexp=%s/%s/%s%s&displayLevel=0' % (MadPath,thisDate.strftime('%Y').lower(),INSTRUMENTS[inst]['INST_MNEUMONIC'],thisDate.strftime('%d%b%y').lower(), extChar)
-                madLink='%sexperiment_list=/%s/%s/%s%s' % (MadPath,thisDate.strftime('%Y').lower(),INSTRUMENTS[inst]['INST_MNEUMONIC'],thisDate.strftime('%d%b%y').lower(), extChar)
+                if onlymad2:
+                    madLink='%sexp=%s/%s/%s%s&displayLevel=0' % (Mad2Path,thisDate.strftime('%Y').lower(),INSTRUMENTS[inst]['INST_MNEUMONIC'],thisDate.strftime('%d%b%y').lower(), extChar)
+                else:
+                    madLink='%sexperiment_list=/%s/%s/%s%s' % (MadPath,thisDate.strftime('%Y').lower(),INSTRUMENTS[inst]['INST_MNEUMONIC'],thisDate.strftime('%d%b%y').lower(), extChar)
                 # Madrigal2:
                 # http://isr.sri.com/madrigal/cgi-bin/madExperiment.cgi?exp=2023/pfa/01mar23b&displayLevel=0
                 # In Madrigal3:
