@@ -155,10 +155,9 @@ if __name__ == '__main__':
             config.set('DEFAULT','ExperimentName',MAD_EXP)
         
         DSTR_OUT={}
-        file_version = "_001"
         if copyON:
             DSTR_OUT['Data Files']=copy.deepcopy(SEC_TEMPLATE)
-            DSTR_OUT['Data Files']['Path']= 'DataFiles' + file_version
+            DSTR_OUT['Data Files']['Path']= 'DataFiles'
             fdir = os.path.join(OUTPUT_PATH,DSTR_OUT['Data Files']['Path'])
             if not os.path.exists(fdir):
                 try: 
@@ -167,7 +166,7 @@ if __name__ == '__main__':
                     raise IOError, 'Unable to make dir %s' % fdir
 
             DSTR_OUT['Additional Plots']=copy.deepcopy(SEC_TEMPLATE)
-            DSTR_OUT['Additional Plots']['Path']='AdditPlots' + file_version
+            DSTR_OUT['Additional Plots']['Path']='AdditPlots'
             additdir = os.path.join(OUTPUT_PATH,DSTR_OUT['Additional Plots']['Path'])
             if not os.path.exists(additdir):
                 try: 
@@ -191,6 +190,7 @@ if __name__ == '__main__':
                 status = config.get(tsec,'status')
                 category = int(config.get(tsec,'category'))
                 history = config.get(tsec,'history')
+                fileOutVerTag = config.get(tsec,'fileOutVerTag')
             except:
                 raise IOError, 'Could not read sec %s' % tsec
 
@@ -220,12 +220,14 @@ if __name__ == '__main__':
                 classname = "Resolved Velocity"
 
             tname = classname
+            if category != 1:
+                tname += ",ver:" + fileOutVerTag
 
             if DSTR_OUT.has_key(tname):
                 tpath = DSTR_OUT[tname]['Path']
             else:
                 DSTR_OUT[tname]=copy.deepcopy(SEC_TEMPLATE)
-                tpath = 'Path%s' % str(len(DSTR_OUT.keys())) + file_version
+                tpath = 'Path%s' % str(len(DSTR_OUT.keys())) + "_" + fileOutVerTag
                 DSTR_OUT[tname]['Path'] = tpath
 
             # make dir
@@ -257,10 +259,13 @@ if __name__ == '__main__':
             
             if copyON:
                 #tit = ckindat + ' - hdf'
+                tit = classname
                 if category != 1:
-                    tit = classname + ', status:' + status  + ', history:' + history + ' - hdf'
-                else:
-                    tit = classname + ' - hdf'
+                    tit += ', status:' + status
+                    if len(history)>0:
+                        tit += ', history:' + history
+
+                tit += ', ver:' + fileOutVerTag + ' - hdf'
                 if not DSTR_OUT['Data Files']['Images'].has_key(tit):
                     DSTR_OUT['Data Files']['Images']['Count']+=1
                     DSTR_OUT['Data Files']['Images'][tit] = {'Count':0,
